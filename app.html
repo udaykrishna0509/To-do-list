@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantastic To-Do List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Base styles and variables */
+        :root {
+            --primary-color: #6a5acd; /* Slate Blue */
+            --secondary-color: #8a2be2; /* Blue Violet */
+            --text-color: #e0e0e0;
+            --dark-text-color: #333;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-shadow: rgba(31, 38, 135, 0.37);
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-color);
+            overflow: hidden; /* Prevent scrollbar from background effects */
+        }
+
+        /* Background animated circles for visual appeal */
+        .circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .circles li {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+            border-radius: 50%;
+        }
+
+        .circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .circles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .circles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+        .circles li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+        .circles li:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+        .circles li:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+        .circles li:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+        .circles li:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
+
+        @keyframes animate {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+        }
+
+        /* To-Do Container - Glassmorphism effect */
+        .todo-container {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            z-index: 1; /* Ensure it's above the circles */
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            animation: fadeInScale 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Input section */
+        .input-section {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .input-section input {
+            flex-grow: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            font-size: 1em;
+            outline: none;
+            transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .input-section input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .input-section input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+        }
+
+        .input-section button {
+            background: linear-gradient(45deg, #a77bff, #8a2be2);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #8a2be2, #a77bff);
+        }
+
+        .input-section button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* To-Do List */
+        .todo-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .todo-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative; /* For the fade-out effect */
+        }
+
+        .todo-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .todo-item.completed {
+            background: rgba(255, 255, 255, 0.05);
+            opacity: 0.7;
+            text-decoration: line-through;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .todo-item.completed .task-text {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .task-text {
+            flex-grow: 1;
+            font-size: 1.1em;
+            font-weight: 400;
+            word-break: break-word; /* Ensure long words wrap */
+            color: var(--text-color);
+        }
+
+        .todo-item .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .todo-item .actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+
+        .todo-item .actions button.complete-btn {
+            color: var(--success-color);
+        }
+
+        .todo-item .actions button.delete-btn {
+            color: var(--danger-color);
+        }
+
+        .todo-item .actions button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .todo-item .actions button.complete-btn:hover {
+            color: #218838; /* Darker green on hover */
+        }
+
+        .todo-item .actions button.delete-btn:hover {
+            color: #c82333; /* Darker red on hover */
+        }
+
+        /* Animation for removing items */
+        .todo-item.fade-out {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+
+        /* Message Box for alerts */
+        .message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .message-box-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .message-box {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            color: var(--text-color);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .message-box-overlay.show .message-box {
+            transform: translateY(0);
+        }
+
+        .message-box p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .message-box button {
+            background: linear-gradient(45deg, #a77bff, #8a2be2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .message-box button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .todo-container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .input-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .input-section button {
+                width: 100%;
+            }
+
+            .todo-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px;
+            }
+
+            .task-text {
+                margin-bottom: 10px;
+                font-size: 1em;
+            }
+
+            .todo-item .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+
+    <div class="todo-container">
+        <h1>Fantastic To-Do List</h1>
+
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <button id="addTaskBtn">
+                <i class="fas fa-plus"></i> Add Task
+            </button>
+        </div>
+
+        <ul class="todo-list" id="todoList">
+            </ul>
+    </div>
+
+    <div id="messageBoxOverlay" class="message-box-overlay">
+        <div class="message-box">
+            <p id="messageBoxText"></p>
+            <button id="messageBoxOkBtn">OK</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase (provided by the Canvas environment)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let db;
+        let auth;
+        let userId;
+
+        // DOM Elements
+        const taskInput = document.getElementById('taskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const todoList = document.getElementById('todoList');
+        const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+        const messageBoxText = document.getElementById('messageBoxText');
+        const messageBoxOkBtn = document.getElementById('messageBoxOkBtn');
+
+        // Function to show a custom message box instead of alert()
+        function showMessageBox(message) {
+            messageBoxText.textContent = message;
+            messageBoxOverlay.classList.add('show');
+        }
+
+        // Event listener for the message box OK button
+        messageBoxOkBtn.addEventListener('click', () => {
+            messageBoxOverlay.classList.remove('show');
+        });
+
+        // Initialize Firebase and set up authentication
+        async function initializeFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Sign in with custom token if available, otherwise anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Listen for auth state changes to get the user ID
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Authenticated user ID:", userId);
+                        // Once authenticated, load tasks
+                        loadTasks();
+                    } else {
+                        // If not authenticated, generate a random ID for anonymous use
+                        userId = crypto.randomUUID();
+                        console.log("Anonymous user ID:", userId);
+                        loadTasks(); // Still load tasks, but they won't persist across sessions without auth
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error initializing Firebase or authenticating:", error);
+                showMessageBox("Failed to initialize the application. Please try again.");
+            }
+        }
+
+        // Function to add a new task to Firestore
+        async function addTaskToFirestore(taskText) {
+            if (!db || !userId) {
+                console.error("Firestore or User ID not available.");
+                showMessageBox("Application not ready. Please wait.");
+                return;
+            }
+            try {
+                const tasksCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/tasks`);
+                await addDoc(tasksCollectionRef, {
+                    text: taskText,
+                    completed: false,
+                    createdAt: Date.now() // Add a timestamp for ordering
+                });
+                console.log("Task added to Firestore:", taskText);
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                showMessageBox("Failed to add task. Please try again.");
+            }
+        }
+
+        // Function to render a task item in the DOM
+        function renderTask(docId, taskData) {
+            const li = document.createElement('li');
+            li.setAttribute('data-id', docId);
+            li.classList.add('todo-item');
+            if (taskData.completed) {
+                li.classList.add('completed');
+            }
+
+            const taskTextSpan = document.createElement('span');
+            taskTextSpan.classList.add('task-text');
+            taskTextSpan.textContent = taskData.text;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.classList.add('actions');
+
+            const completeBtn = document.createElement('button');
+            completeBtn.classList.add('complete-btn');
+            completeBtn.innerHTML = '<i class="fas fa-check-circle"></i>';
+            completeBtn.title = taskData.completed ? 'Mark Incomplete' : 'Mark Complete';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteBtn.title = 'Delete Task';
+
+            actionsDiv.appendChild(completeBtn);
+            actionsDiv.appendChild(deleteBtn);
+            li.appendChild(taskTextSpan);
+            li.appendChild(actionsDiv);
+
+            // Add event listeners directly to the buttons within the created li
+            completeBtn.addEventListener('click', () => toggleTaskCompletion(docId, li, taskData.completed));
+            deleteBtn.addEventListener('click', () => deleteTask(docId, li));
+
+            todoList.prepend(li); // Add new tasks to the top
+        }
+
+        // Function to load tasks from Firestore using onSnapshot for real-time updates
+        function loadTasks() {
+            if (!db || !userId) {
+                console.log("Firestore or User ID not ready for loading tasks.");
+                return;
+            }
+
+            const tasksCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/tasks`);
+            // Use onSnapshot to listen for real-time updates
+            onSnapshot(tasksCollectionRef, (snapshot) => {
+                // Clear existing tasks to re-render based on current snapshot
+                todoList.innerHTML = '';
+                // Sort tasks by createdAt timestamp (newest first)
+                const sortedDocs = snapshot.docs.sort((a, b) => b.data().createdAt - a.data().createdAt);
+                sortedDocs.forEach(doc => {
+                    renderTask(doc.id, doc.data());
+                });
+            }, (error) => {
+                console.error("Error listening to tasks:", error);
+                showMessageBox("Failed to load tasks. Please refresh.");
+            });
+        }
+
+        // Function to toggle task completion status in Firestore
+        async function toggleTaskCompletion(docId, listItem, currentStatus) {
+            if (!db || !userId) {
+                console.error("Firestore or User ID not available.");
+                showMessageBox("Application not ready. Please wait.");
+                return;
+            }
+            try {
+                const taskRef = doc(db, `artifacts/${appId}/users/${userId}/tasks`, docId);
+                await updateDoc(taskRef, {
+                    completed: !currentStatus
+                });
+                console.log("Task completion toggled:", docId);
+            } catch (e) {
+                console.error("Error updating document: ", e);
+                showMessageBox("Failed to update task status. Please try again.");
+            }
+        }
+
+        // Function to delete a task from Firestore
+        async function deleteTask(docId, listItem) {
+            if (!db || !userId) {
+                console.error("Firestore or User ID not available.");
+                showMessageBox("Application not ready. Please wait.");
+                return;
+            }
+            try {
+                // Add fade-out class for smooth transition
+                listItem.classList.add('fade-out');
+                // Wait for the transition to complete before removing from DOM and Firestore
+                listItem.addEventListener('transitionend', async () => {
+                    const taskRef = doc(db, `artifacts/${appId}/users/${userId}/tasks`, docId);
+                    await deleteDoc(taskRef);
+                    console.log("Task deleted from Firestore:", docId);
+                    // The onSnapshot listener will automatically remove it from the DOM
+                }, { once: true }); // Ensure the listener runs only once
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+                showMessageBox("Failed to delete task. Please try again.");
+            }
+        }
+
+        // Event listener for adding a new task
+        addTaskBtn.addEventListener('click', () => {
+            const taskText = taskInput.value.trim();
+            if (taskText !== "") {
+                addTaskToFirestore(taskText);
+                taskInput.value = ""; // Clear input after adding
+            } else {
+                showMessageBox("Please enter a task!");
+            }
+        });
+
+        // Allow adding task with Enter key
+        taskInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                addTaskBtn.click();
+            }
+        });
+
+        // Initialize Firebase when the window loads
+        window.onload = initializeFirebase;
+
+    </script>
+</body>
+</html>
